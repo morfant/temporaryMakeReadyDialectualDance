@@ -25,7 +25,7 @@ SynthDef.new(\triwNoise, {
 	// sigG = LFNoise0.kr(dens, freq/2, add: freq/2);
 	sigG = LFNoise0.kr(dens, freq);
 	// sig = LFPulse.ar(sigG, mul: amp);
-	sigNoise = WhiteNoise.ar((sigG - abs(sigG))/2);
+	sigNoise = PinkNoise.ar((sigG - abs(sigG))/2);
 	sigNoise = RHPF.ar(sigNoise, hfFreq, hfRq);
 	// sigNoise = LFPulse.ar(16000, mul: (sigG - abs(sigG))/2);
 	// sig = LFTri.ar(sigG, mul: amp);
@@ -41,7 +41,7 @@ SynthDef.new(\triwNoise, {
 )
 
 
-d = Synth(\triwNoise, [\freq, 100, \dens, 8, \amp, 0.5]);
+d = Synth(\triwNoise, [\freq, 100, \dens, 8, \amp, 0.05]);
 d.set(\freq, 20, \dens, 20, \amp, 0.5, \outAmp, 0.5);
 // 예측할 수 없는 것이 나온다.
 
@@ -50,7 +50,7 @@ d.set(\freq, 20, \dens, 20, \amp, 0.5, \outAmp, 0.5);
 	\instrument, \triwNoise,
 	\freq, 10,
 	\dens, 8,
-	\amp, 0.5,
+	\amp, 0.05,
 	\atTime, 0.4,
 	\relTime, 0.6,
 	\dur, 0.5
@@ -130,7 +130,7 @@ d.set(\freq, 20, \dens, 20, \amp, 0.5, \outAmp, 0.5);
 	\dens, Pseq([10, 4, 6, 7, 8, 14], inf),
 	\atTime, 0.2,
 	\relTime, 0.1,
-	\amp, 0.5,
+	\amp, 0.1,
 	// \dur, Pseq([0.3, 0.7, 1, 0.8, 0.2, 1], inf)
 	\dur, Pseq([0.3, 0.1, 0.4, 0.2, 0.1, 0.06, 0.1], inf),
 	// \hfFreq, Pseq([9000, 9000, 8000, 11000, 200, 1000], inf),

@@ -15,7 +15,7 @@ SynthDef.new(\dum, {
 a = Synth(\dum, [\freq, 100]);
 
 
-(
+(// basic + ?
 ~pb_dum = Pbind(
 	\instrument, \dum,
 	\freq, 100,
@@ -24,6 +24,20 @@ a = Synth(\dum, [\freq, 100]);
 	\dur, Prand([1.0, 0.8, 0.7, 0.3, 1.5], inf),
 	\hfFreq, 60
 ).play;
+)
+
+
+
+
+(// basic
+~pb_dum.stream = Pbind(
+	\instrument, \dum,
+	\freq, 100,
+	\dens, 5,
+	\amp, 0.5,
+	\dur, Prand([1.0, 0.8, 0.7, 0.3, 1.5], inf),
+	\hfFreq, 60
+).asStream;
 )
 
 
@@ -48,5 +62,8 @@ a = Synth(\dum, [\freq, 100]);
 	\dur, Prand([1.0, 0.8, 0.7, 0.3, 1.5], inf)
 ).asStream;
 )
+
+
+
 
 
