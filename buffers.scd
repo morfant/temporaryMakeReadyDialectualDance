@@ -10,6 +10,12 @@
 ~book = Buffer.read(s, "/Users/giy/Desktop/TMRDD/book.aiff");
 // ~book.play;
 
+~na1 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/na1.aiff");
+// ~na1.play;
+
+~na2 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/na2.aiff");
+//~na2.play;
+
 )
 
 
@@ -43,6 +49,27 @@ SynthDef(\book,
 	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
 }).add;
 
+
+// mew
+SynthDef(\na1,
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0 |
+		var sig1, env;
+		sig1 = PlayBuf.ar(2, ~na1, BufRateScale.kr(~na1)*rate, startPos: 0, loop: loop, doneAction: 2);
+		env = EnvGen.kr(Env.linen(0.01, ~na1.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
+	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
+	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
+}).add;
+
+
+SynthDef(\na2,
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0 |
+		var sig1, env;
+		sig1 = PlayBuf.ar(2, ~na2, BufRateScale.kr(~na2)*rate, startPos: 0, loop: loop, doneAction: 2);
+		env = EnvGen.kr(Env.linen(0.01, ~na2.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
+	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
+	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
+}).add;
+
 )
 
 
@@ -57,6 +84,17 @@ SynthDef(\book,
 //Q: 주성씨가 탄 욕조가 무대에 나오면
 ~naration_forMe = Synth(\for, [\amp, 0.18]);
 ~naration_forMe.free;
+
+
+// new
+//처음 시작할 때
+~na1_Syn = Synth(\na1, [\amp, 0.5]);
+~na1_Syn.free;
+
+//진호씨가 스피커 가지고 나오면 튼다.
+~na2_Syn = Synth(\na2, [\amp, 0.5]);
+~na2_Syn.free;
+
 
 
 
