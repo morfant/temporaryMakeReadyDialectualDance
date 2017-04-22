@@ -59,7 +59,7 @@ SynthDef.new(\tak, {
 
 
 (// floating?
-~pb_mel = Pbind(
+~pb_mel_1 = Pbind(
 	\instrument, \tak,
 	\freq, Pseq([620, 330, 370, 500, 330, 380, 320], inf),
 	// \dur, Pseq([0.5, 0.5, 0.3, 0.3, 0.8, 0.25, 0.3]*0.8, inf),
@@ -67,31 +67,38 @@ SynthDef.new(\tak, {
 	\dur, 0.5,
 	\atTime, 0.9,
 	\relTime, 0.1
-).play;
-)
+);
 
 
-
-(// floating - 2
-~pb_mel.stream = Pbind(
+// floating - 2 (low)
+~pb_mel_2 = Pbind(
 	\instrument, \tak,
 	\freq, Pseq([620, 330, 370, 500, 330, 380, 320]*0.3, inf),
 	\dur, 0.5,
 	\atTime, 0.9,
 	\relTime, 0.1
-).asStream;
-)
+);
 
 
-(// floating - 3
-~pb_mel.stream = Pbind(
+// floating - 3
+~pb_mel_3 = Pbind(
 	\instrument, \tak,
 	\freq, Pseq([620, 330, 370, 500, 330, 380, 320]*1.2, inf),
 	\dur, 0.5,
 	\atTime, 0.9,
 	\relTime, 0.1
-).asStream;
+);
 )
+
+~cur = ~pb_mel_1.play;
+~cur.stop;
+~pb_mel_1.stop;
+~cur = ~pb_mel_2.play;
+~cur.stop;
+~cur = ~pb_mel_3.play;
+~cur.stop;
+
+
 
 a = Synth(\tak, [\freq, 9980, \amp, 0.3]);
 
