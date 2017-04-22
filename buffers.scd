@@ -390,7 +390,7 @@ SynthDef.new(\dum, {
 	\instrument, \dum,
 	\freq, 90,
 	\dens, 1,
-	\amp, 1.2,
+	\amp, 1.4,
 	\dur, Prand([1.0, 0.8, 0.7, 0.3, 1.5], inf)
 );
 
@@ -406,13 +406,19 @@ a.set(\dens, 19, \freq, 100, \amp, 1.2, \rate, 6, \outAmp, 1.0); // 락킹
 a.free;
 
 
+
 (
+~masterEQ.gui.onSelect('x_loudness');
 ~pb_rocking = Pbind.new(
 	\instrument, \jabNoise,
-	\dur, Pseq([0.1, 0.1, 0.2, 0.3, 0.1, 0.2, 0.1, 0.04, 0.005]*0.9, inf),
-	\freq, Pseq([100, 120, 80, 130, 105, 110]*2, inf),
+	\amp, 0.8,
+	// \dur, Pseq([0.1, 0.1, 0.2, 0.3, 0.1, 0.2, 0.1, 0.04, 0.005]*0.9, inf),
+	\dur, Pseq([Pseq([0.1], rrand(7, 15)), 0.3], inf),
+	// \freq, Pseq([100, 120, 80, 130, 105, 110]*2, inf),
+	\freq, Pseq([Pseq([rrand(20, 30)], 15), 100, Pseq([20], 15), 110, Pseq([20], 15), 100], inf),
 	\rate, Prand([10, 6, 4, 7, 9], inf),
-	\atTime, Prand([0.05, 0.01, 0.02, 0.03]*0.01, inf),
+	// \atTime, Prand([0.05, 0.01, 0.02, 0.03]*0.01, inf),
+	\atTime, Pseq([0.05, 0.05, Prand([0.05, 0.1, 0.02, 0.3], 1), 0.05, 0.05, 0.05, Prand([0.05, 0.01, 0.02, 0.03], 1)], inf),
 	\relTime, 0.02
 ).play;
 
@@ -427,35 +433,41 @@ a.set(\freq, 470, \freqDiff, 3);
 // 번갈아 가도록
 
 
+(
+// Ending - 시작부터 갑자기 커야 한다.
+~masterEQ.gui.onSelect('ending');
+a.free;a = Synth(\dds, [\nf, 0.2, \freq, 2, \filFreq, 100, \susTime, 4, \amp, 1.0]);
+// a.set(\nf, 2, \freq, 2, \filFreq, 100, \susTime, 1);
 
-// Ending
-a.free;a = Synth(\dds, [\freq, 2000, \freqDiff, 3, \amp, 0.5, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1.2]);
-
-a.set(\nf, 2, \freq, 2, \filFreq, 100, \susTime, 1);
-a.free;a = Synth(\dds, [\nf, 0.2, \freq, 2, \filFreq, 100, \susTime, 4]);
-a.free;
-
-b.free;b = Synth(\dds, [\freq, 1, \freqDiff, 2, \amp, 0.9, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 3]);
-b.free;
-
-c.free;c = Synth(\dds, [\freq, 0.5, \freqDiff, 18, \amp, 0.9, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 1]);
-c.free;
-
-d.free;
-d.free;d = Synth(\dds, [\freq, 1.5, \freqDiff, 18, \amp, 0.1, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 1]);
+a.free;a = Synth(\dds, [\freq, 3, \freqDiff, 30, \amp, 1.0, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1]);
+b.free;b = Synth(\dds, [\freq, 1, \freqDiff, 2, \amp, 0.9, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1]);
+// b.free;
+c.free;c = Synth(\dds, [\freq, 0.5, \freqDiff, 18, \amp, 0.9, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 2]);
+// c.free;
+d.free;d = Synth(\dds, [\freq, 1.5, \freqDiff, 18, \amp, 0.1, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 6]);
+// d.free;
+e.free;e =  Synth(\dds2, [\freq, 1.5, \freqDiff, 3, \amp, 1.0, \amp2, 0.1, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 3]);
+)
 
 e.free;
-e.free;e =  Synth(\dds2, [\freq, 1.5, \freqDiff, 13, \amp, 0.1, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 1]);
 // 현상 유지 시키려면?
+
+
+
+
 
 // Noise + Bass
 ~t.stop;~a.stop;~masterEQ.gui.onSelect('nb');~t = ~pb_nos_1.play;~a = ~pb_dum_basic.play;
 ~t.stop;~a.stop;~masterEQ.gui.onSelect('x_flat');~t = ~pb_nos_2.play;~a = ~pb_dum_basic.play;
 ~t.stop;~a.stop;
 
+
+
+// Bass
+// 선풍기 바람 맞을 때 페이드인
 ~a = ~pb_dum_basic.play;
 ~b = ~pb_dum_fast.play;
-~c = ~pb_dum_slow.play;
+~masterEQ.gui.onSelect('nb');~c = ~pb_dum_slow.play;
 ~a.stop;
 ~b.stop;
 ~c.stop;
@@ -493,10 +505,10 @@ e.free;e =  Synth(\dds2, [\freq, 1.5, \freqDiff, 13, \amp, 0.1, \filfreq, 4080, 
 
 
 // mel
+// fade in 으로 들어갈것
 ~masterEQ.gui.onSelect('x_flat');~m1 = ~pb_mel_1.play;
-~m1.stop;
-~m2 = ~pb_mel_2.play;
-~m2.stop;
+~m1.stop;~m2 = ~pb_mel_2.play; // to low
+~m2.stop;~m1 = ~pb_mel_1.play; // to high
 ~m3 = ~pb_mel_3.play;
 ~m3.stop;
 

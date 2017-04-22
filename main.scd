@@ -19,7 +19,8 @@
 ~na1_Syn.free;
 
 //2. 메트리스 in
-~masterEQ.gui.onSelect('narration');~na2_Syn = Synth(\na2, [\amp, 2.0]);
+~t.stop;~a.stop;
+~masterEQ.gui.onSelect('narration');~na2_Syn = Synth(\na2, [\amp, 1.8]);
 ~na2_Syn.free;
 
 //3. 스피커 in
