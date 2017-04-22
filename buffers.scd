@@ -134,17 +134,17 @@ SynthDef.new(\triwNoise, {
 
 // Noise 2
 SynthDef.new(\jabNoise, {
-	arg freq = 10, dens = 10, rate = 1.4, amp = 0.5, outAmp = 0.5, gate = 1, atTIme = 0.01, relTime = 0.1;
+	arg freq = 10, dens = 10, rate = 1.4, amp = 0.5, outAmp = 1.0, gate = 1, atTIme = 0.01, relTime = 0.1;
 	var sig, env;
 
 	// var sigRythm = Dust.kr(dens, 1) * LFNoise0.kr(rate);
 	var sigRythm = LFNoise0.kr(rate, add: 1)/2;
 	// var sigRythm = Dust.kr(dens, 1);
 	// var sig = LFTri.ar(freq, mul: sigRythm);
-	// sig = LFTri.ar(freq, mul: sigRythm);
+	sig = LFTri.ar(freq, mul: sigRythm);
 	// sig = LFSaw.ar(freq, mul: sigRythm);
 	// sig = LFPar.ar(freq, mul: sigRythm);
-	sig = LFPulse.ar(freq, mul: sigRythm);
+	// sig = LFPulse.ar(freq, mul: sigRythm);
 	env = EnvGen.kr(Env.perc(atTIme, relTime, curve: 5), gate, doneAction: 2);
 
 	Out.ar(0, Pan2.ar(sig*env, 0, outAmp));
@@ -408,21 +408,19 @@ a.free;
 
 
 (
-~masterEQ.gui.onSelect('x_loudness');
+~masterEQ.gui.onSelect('rocking');
 ~pb_rocking = Pbind.new(
 	\instrument, \jabNoise,
 	\amp, 0.8,
-	// \dur, Pseq([0.1, 0.1, 0.2, 0.3, 0.1, 0.2, 0.1, 0.04, 0.005]*0.9, inf),
-	\dur, Pseq([Pseq([0.1], rrand(7, 15)), 0.3], inf),
-	// \freq, Pseq([100, 120, 80, 130, 105, 110]*2, inf),
-	\freq, Pseq([Pseq([rrand(20, 30)], 15), 100, Pseq([20], 15), 110, Pseq([20], 15), 100], inf),
+	\dur, Pseq([Pseq([0.1], rrand(7, 15)), 0.2], inf),
+	// \freq, Pseq([Pseq([rrand(20, 30)], 5), 200, Pseq([20], 10), 110, Pseq([20], 3), 100], inf),
+	// \freq, Pseq([Pseq([rrand(20, 30)]*3, 5), 200, Pseq([20]*2, 10), 110, Pseq([20]*4, 3), 100]*1.4, inf),
+	\freq, Pseq([Pseq([rrand(20, 30)]*3, 5), 200, Pseq([20]*2, 10), 110, Pseq([20]*4, 3), 100]*2.9, inf),
 	\rate, Prand([10, 6, 4, 7, 9], inf),
-	// \atTime, Prand([0.05, 0.01, 0.02, 0.03]*0.01, inf),
 	\atTime, Pseq([0.05, 0.05, Prand([0.05, 0.1, 0.02, 0.3], 1), 0.05, 0.05, 0.05, Prand([0.05, 0.01, 0.02, 0.03], 1)], inf),
-	\relTime, 0.02
+	\relTime, 0.025,
+	\outAmp, 1.0
 ).play;
-
-
 )
 
 
@@ -513,5 +511,8 @@ e.free;
 ~m3.stop;
 
 
+//<todo>
+김광석 노래 관련 씬 정리
+3번째 나레이션과 오버랩
 
 

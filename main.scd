@@ -28,9 +28,9 @@
 ~na3_Syn.free;
 
 
-// 서른즈음에
+// 서른즈음에 (2절 '점점더~' 부터)
 //1. 페이드 인
-~masterEQ.gui.onSelect('x_flat');~kim_song = Synth(\kim, [\amp, 0.1, \atTime, 20, \relTime, 10, \gate, 1]);
+~masterEQ.gui.onSelect('x_flat');~kim_song = Synth(\kim, [\amp, 0.3, \atTime, 20, \relTime, 10, \gate, 1]);
 
 // 2. 페이드아웃
 ~kim_song.release(14);
