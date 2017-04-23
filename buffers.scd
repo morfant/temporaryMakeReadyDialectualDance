@@ -1,8 +1,61 @@
 
 //---------------------------- 0: EQ ----------------------------
-~masterEQ = ChannelEQ.new(2, s, 0, 0);
+(
+// SLIDER
+~win = Window.new("4 CH mixer", Rect(0, 0, 400, 400)).front;
 
+~num_0 = NumberBox(~win, Rect(20, 20, 60, 40));
+~num_1 = NumberBox(~win, Rect(20, 120, 60, 40));
+~num_2 = NumberBox(~win, Rect(20, 220, 60, 40));
+~num_3 = NumberBox(~win, Rect(20, 320, 60, 40));
+
+~scale = 3.0;
+
+~slid_0 = Slider(~win, Rect(100, 20, 200, 40)).action_({
+	postln("slid_0: " + ~slid_0.value.round(0.01));
+	~num_0.value_((~slid_0.value*~scale).round(0.01));
+	~mixer.set(\amp_0, ~slid_0.value*~scale);
+});
+
+~slid_1 = Slider(~win, Rect(100, 120, 200, 40)).action_({
+	postln("slid_1: " + ~slid_1.value.round(0.01));
+	~num_1.value_((~slid_1.value*~scale).round(0.01));
+	~mixer.set(\amp_1, ~slid_1.value*~scale);
+});
+
+~slid_2 = Slider(~win, Rect(100, 220, 200, 40)).action_({
+	postln("slid_2: " + ~slid_2.value.round(0.01));
+	~num_2.value_((~slid_2.value*~scale).round(0.01));
+	~mixer.set(\amp_2, ~slid_2.value*~scale);
+});
+
+~slid_3 = Slider(~win, Rect(100, 320, 200, 40)).action_({
+	postln("slid_3: " + ~slid_3.value.round(0.01));
+	~num_3.value_((~slid_3.value*~scale).round(0.01));
+	~mixer.set(\amp_3, ~slid_3.value*~scale);
+});
+
+
+// 기본값 셋업
+~slid_0.value_(1.0/~scale);
+~num_0.value_(~slid_0.value);
+
+~slid_1.value_(1.0/~scale);
+~num_1.value_(~slid_1.value);
+
+~slid_2.value_(1.0/~scale);
+~num_2.value_(~slid_2.value);
+
+~slid_3.value_(1.0/~scale);
+~num_3.value_(~slid_3.value);
+
+
+
+// EQ
+~masterEQ = ChannelEQ.new(2, s, 0, 0);
 ~masterEQ.gui.onSelect('x_flat');
+~mixer.free; ~mixer = Synth(\mixer, [\amp_0, 1.0, \amp_1, 0.5,  \amp_2, 0.5,  \amp_3, 0.5 ]);
+);
 
 
 
@@ -19,14 +72,13 @@
 // ~book.play;
 
 ~na1 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/na1.aiff");
-~na1.play;
+// ~na1.play;
 
 ~na2 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/na2.aiff");
-~na2.play;
+// ~na2.play;
 
 ~na3 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/na3.aiff");
-~na3.play;
-
+// ~na3.play;
 
 ~kim = Buffer.read(s, "/Users/giy/Desktop/TMRDD/kim.aiff");
 // ~kim.play;
@@ -66,32 +118,32 @@ SynthDef(\book,
 
 // new narations
 SynthDef(\na1,
-	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0 |
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
 		var sig1, env;
 		sig1 = PlayBuf.ar(1, ~na1, BufRateScale.kr(~na1)*rate, startPos: 0, loop: loop, doneAction: 2);
 		env = EnvGen.kr(Env.linen(0.01, ~na1.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
-	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
+	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
 }).add;
 
 
 SynthDef(\na2,
-	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0 |
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
 		var sig1, env;
 		sig1 = PlayBuf.ar(1, ~na2, BufRateScale.kr(~na2)*rate, startPos: 0, loop: loop, doneAction: 2);
 		env = EnvGen.kr(Env.linen(0.01, ~na2.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
-	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
+	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
 }).add;
 
 
 SynthDef(\na3,
-	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0 |
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
 		var sig1, env;
 		sig1 = PlayBuf.ar(1, ~na3, BufRateScale.kr(~na3)*rate, startPos: 0, loop: loop, doneAction: 2);
 		env = EnvGen.kr(Env.linen(0.01, ~na3.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
-	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
+	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
 }).add;
 
 
@@ -156,7 +208,7 @@ SynthDef.new(\jabNoise, {
 
 // Melodic
 SynthDef.new(\tak, {
-	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, atTime = 0.3, relTime = 0.4;
+	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, atTime = 0.3, relTime = 0.4, outBus = 100;
 	var env, sig, sig1, sig2, sig3, sig4, sig5, sigG, sigNoise;
 	env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 
@@ -178,7 +230,7 @@ SynthDef.new(\tak, {
 	sig = sig1 + sig2 + sig3 + sig4 + sig5;
 	// sig = LFTri.ar(freq, mul: amp/2);
 
-	Out.ar(0, Pan2.ar(sig*env, 0, outAmp));
+	Out.ar(outBus, Pan2.ar(sig*env, 0, outAmp));
 
 }).add;
 
@@ -264,15 +316,33 @@ SynthDef(\dds2, {| freq = 1, modfreq = 5, amp = 0.6, amp2 = 0.9, filfreq = 300, 
 
 // Dum
 SynthDef.new(\dum, {
-	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80;
+	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80, outBus = 104;
 	var env, sig, sigG, sigNoise, hf;
 	env = EnvGen.kr(Env.perc(), gate, doneAction: 2);
 	sigG = LFNoise0.kr(dens, freq/2, freq/2);
 	sig = LFPar.ar(sigG, mul: amp);
 	sig = HPF.ar(sig, hfFreq);
-	Out.ar(0, Pan2.ar(sig*env, 0, outAmp));
+	Out.ar(outBus, Pan2.ar(sig*env, 0, outAmp));
 
 }).add;
+
+
+// Mixer
+SynthDef.new(\mixer,
+	{
+		arg amp_0 = 0.5, amp_1 = 0.5, amp_2 = 0.5, amp_3 = 0.5, amp_master = 1.0;
+		var sig_0, sig_1, sig_2, sig_3;
+		sig_0 = In.ar(100, 2);
+		sig_1 = In.ar(102, 2);
+		sig_2 = In.ar(104, 2);
+		sig_3 = In.ar(106, 2);
+
+		Out.ar(0, ((sig_0*amp_0) + (sig_1*amp_1) + (sig_2*amp_2) + (sig_3*amp_3))*amp_master);
+
+	}
+).add;
+
+
 )
 
 
@@ -287,7 +357,8 @@ SynthDef.new(\dum, {
 	// \dur, Pseq([0.5, 0.5, 0.3, 0.3, 0.8, 0.25, 0.3]*2.8, inf),
 	\dur, 0.5,
 	\atTime, 0.9,
-	\relTime, 0.1
+	\relTime, 0.1,
+	\outBus, 100
 );
 
 
@@ -297,7 +368,8 @@ SynthDef.new(\dum, {
 	\freq, Pseq([620, 330, 370, 500, 330, 380, 320]*0.3, inf),
 	\dur, 0.5,
 	\atTime, 0.9,
-	\relTime, 0.1
+	\relTime, 0.1,
+	\outBus, 102
 );
 
 
@@ -407,49 +479,12 @@ a.free;
 
 
 
-(
-~masterEQ.gui.onSelect('rocking');
-~pb_rocking = Pbind.new(
-	\instrument, \jabNoise,
-	\amp, 0.8,
-	\dur, Pseq([Pseq([0.1], rrand(7, 15)), 0.2], inf),
-	// \freq, Pseq([Pseq([rrand(20, 30)], 5), 200, Pseq([20], 10), 110, Pseq([20], 3), 100], inf),
-	// \freq, Pseq([Pseq([rrand(20, 30)]*3, 5), 200, Pseq([20]*2, 10), 110, Pseq([20]*4, 3), 100]*1.4, inf),
-	\freq, Pseq([Pseq([rrand(20, 30)]*3, 5), 200, Pseq([20]*2, 10), 110, Pseq([20]*4, 3), 100]*2.9, inf),
-	\rate, Prand([10, 6, 4, 7, 9], inf),
-	\atTime, Pseq([0.05, 0.05, Prand([0.05, 0.1, 0.02, 0.3], 1), 0.05, 0.05, 0.05, Prand([0.05, 0.01, 0.02, 0.03], 1)], inf),
-	\relTime, 0.025,
-	\outAmp, 1.0
-).play;
-)
-
 
 // nul pan ji
 a = Synth(\nul, [\freq, 470, \freqDiff, 2, \amp_1, 0.1, \amp_2, 0.1, \outAmp, 0.3]);
 a.set(\freq, 520, \freqDiff, 1);
 a.set(\freq, 470, \freqDiff, 3);
 // 번갈아 가도록
-
-
-(
-// Ending - 시작부터 갑자기 커야 한다.
-~masterEQ.gui.onSelect('ending');
-a.free;a = Synth(\dds, [\nf, 0.2, \freq, 2, \filFreq, 100, \susTime, 4, \amp, 1.0]);
-// a.set(\nf, 2, \freq, 2, \filFreq, 100, \susTime, 1);
-
-a.free;a = Synth(\dds, [\freq, 3, \freqDiff, 30, \amp, 1.0, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1]);
-b.free;b = Synth(\dds, [\freq, 1, \freqDiff, 2, \amp, 0.9, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1]);
-// b.free;
-c.free;c = Synth(\dds, [\freq, 0.5, \freqDiff, 18, \amp, 0.9, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 2]);
-// c.free;
-d.free;d = Synth(\dds, [\freq, 1.5, \freqDiff, 18, \amp, 0.1, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 6]);
-// d.free;
-e.free;e =  Synth(\dds2, [\freq, 1.5, \freqDiff, 3, \amp, 1.0, \amp2, 0.1, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 3]);
-)
-
-e.free;
-// 현상 유지 시키려면?
-
 
 
 
@@ -461,14 +496,6 @@ e.free;
 
 
 
-// Bass
-// 선풍기 바람 맞을 때 페이드인
-~a = ~pb_dum_basic.play;
-~b = ~pb_dum_fast.play;
-~masterEQ.gui.onSelect('nb');~c = ~pb_dum_slow.play;
-~a.stop;
-~b.stop;
-~c.stop;
 
 
 
@@ -502,13 +529,6 @@ e.free;
 
 
 
-// mel
-// fade in 으로 들어갈것
-~masterEQ.gui.onSelect('x_flat');~m1 = ~pb_mel_1.play;
-~m1.stop;~m2 = ~pb_mel_2.play; // to low
-~m2.stop;~m1 = ~pb_mel_1.play; // to high
-~m3 = ~pb_mel_3.play;
-~m3.stop;
 
 
 //<todo>
