@@ -82,6 +82,16 @@
 
 ~kim = Buffer.read(s, "/Users/giy/Desktop/TMRDD/kim.aiff");
 // ~kim.play;
+
+
+~mf1 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/mf_1.aiff");
+// ~mf1.play;
+// ~mf1.free;
+
+~mf2 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/mf_2.aiff");
+// ~mf2.play;
+// ~mf2.free;
+
 )
 
 
@@ -120,7 +130,7 @@ SynthDef(\book,
 SynthDef(\na1,
 	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
 		var sig1, env;
-		sig1 = PlayBuf.ar(1, ~na1, BufRateScale.kr(~na1)*rate, startPos: 0, loop: loop, doneAction: 2);
+		sig1 = PlayBuf.ar(2, ~na1, BufRateScale.kr(~na1)*rate, startPos: 0, loop: loop, doneAction: 2);
 		env = EnvGen.kr(Env.linen(0.01, ~na1.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
@@ -130,7 +140,7 @@ SynthDef(\na1,
 SynthDef(\na2,
 	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
 		var sig1, env;
-		sig1 = PlayBuf.ar(1, ~na2, BufRateScale.kr(~na2)*rate, startPos: 0, loop: loop, doneAction: 2);
+		sig1 = PlayBuf.ar(2, ~na2, BufRateScale.kr(~na2)*rate, startPos: 0, loop: loop, doneAction: 2);
 		env = EnvGen.kr(Env.linen(0.01, ~na2.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
@@ -140,7 +150,7 @@ SynthDef(\na2,
 SynthDef(\na3,
 	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
 		var sig1, env;
-		sig1 = PlayBuf.ar(1, ~na3, BufRateScale.kr(~na3)*rate, startPos: 0, loop: loop, doneAction: 2);
+		sig1 = PlayBuf.ar(2, ~na3, BufRateScale.kr(~na3)*rate, startPos: 0, loop: loop, doneAction: 2);
 		env = EnvGen.kr(Env.linen(0.01, ~na3.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
@@ -155,6 +165,63 @@ SynthDef(\kim,
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
 }).add;
+
+
+SynthDef(\mf1,
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, atTime = 10.0, relTime = 10.0, outBus = 0 |
+		var sig1, env;
+		sig1 = PlayBuf.ar(2, ~mf1, BufRateScale.kr(~mf1)*rate, startPos: 0, loop: loop, doneAction: 2);
+		env = EnvGen.kr(Env.linen(atTime, ~mf1.numFrames/s.sampleRate - (atTime + relTime), relTime), gate, doneAction:2);
+	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
+	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
+}).add;
+
+
+SynthDef(\mf2,
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, start = 0, susTime = 1.0, rate = 1, loop = 0, atTime = 0.1, relTime = 0.1, outBus = 0 |
+		var sig1, env;
+		sig1 = PlayBuf.ar(2, ~mf2, BufRateScale.kr(~mf2)*rate, startPos: start, loop: loop, doneAction: 2);
+		// env = EnvGen.kr(Env.linen(atTime, ~mf2.numFrames/s.sampleRate - (atTime + relTime), relTime), gate, doneAction:2);
+		env = EnvGen.kr(Env.linen(atTime, susTime, relTime), gate, doneAction:2);
+	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
+	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
+}).add;
+
+
+SynthDef(\kim,
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, atTime = 10.0, relTime = 10.0 |
+		var sig1, env;
+		sig1 = PlayBuf.ar(2, ~kim, BufRateScale.kr(~kim)*rate, startPos: 0, loop: loop, doneAction: 2);
+		env = EnvGen.kr(Env.linen(atTime, ~kim.numFrames/s.sampleRate - (atTime + relTime), relTime), gate, doneAction:2);
+	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
+	Out.ar(0, Pan2.ar((sig1) * env, pan, amp));
+}).add;
+
+
+
+// Comp for ending
+SynthDef(\comp,
+	{
+		arg ths = 0.1, clampTime = 0.001, startBus = 60, outBus = 0, amp = 0.3;
+		var finalSig, sigSum, sig0, sig1, sig2, sig3, sig4, sig5, sig6, sig7;
+		sig0 = In.ar(startBus, 2);
+		sig1 = In.ar(startBus + 2, 2);
+		sig2 = In.ar(startBus + 4, 2);
+		sig3 = In.ar(startBus + 6, 2);
+		sig4 = In.ar(startBus + 8, 2);
+		sig5 = In.ar(startBus + 10, 2);
+		sig6 = In.ar(startBus + 12, 2);
+		sig7 = In.ar(startBus + 20, 2);
+		// sig8 = In.ar(60, 2);
+
+		sigSum = sig0 + sig1 + sig2 + sig3 + sig4 + sig5 + sig6 + sig7;
+		// finalSig = CompanderD.ar(sigSum, clampTime: 0.001, mul: 0.9);
+		finalSig = Compander.ar(sigSum, clampTime: 0.001, mul: 0.9);
+
+		Out.ar(outBus, finalSig*amp);
+
+	}
+).add;
 
 
 // Sound Synths
@@ -263,7 +330,7 @@ SynthDef.new(\nul, {
 
 // Ending
 SynthDef(\dds, {| freq = 1, modfreq = 5, amp = 0.6, amp2 = 0.9, filfreq = 300, rq = 0.1, gate = 1, hfFreq1 = 100, hfFreq2 = 200,
-	atTime = 0.1, susTime = 0.1, relTime = 0.9, pan = 0, nf = 7, freqDiff = 2|
+	atTime = 0.1, susTime = 0.1, relTime = 0.9, pan = 0, nf = 7, freqDiff = 2, outBus = 0 |
 	var sig, env, sig2, sig_beating, del, mod, lowcut_sig, lowcut_sig2;
 	// sig = Blip.ar(freq);
 	// sig = LFPar.ar(freq);
@@ -284,12 +351,12 @@ SynthDef(\dds, {| freq = 1, modfreq = 5, amp = 0.6, amp2 = 0.9, filfreq = 300, r
 	lowcut_sig2 = HPF.ar(sig2, hfFreq2);
 
 	// Out.ar(0, Pan2.ar((sig + sig2) * env, pan, amp));
-	Out.ar(0, Pan2.ar((lowcut_sig + lowcut_sig2) * env, pan, amp));
+	Out.ar(outBus, Pan2.ar((lowcut_sig + lowcut_sig2) * env, pan, amp));
 }).add;
 
 
 SynthDef(\dds2, {| freq = 1, modfreq = 5, amp = 0.6, amp2 = 0.9, filfreq = 300, rq = 0.1, gate = 1, hfFreq1 = 100, hfFreq2 = 200,
-	atTime = 0.1, susTime = 0.1, relTime = 0.9, pan = 0, nf = 7, freqDiff = 2|
+	atTime = 0.1, susTime = 0.1, relTime = 0.9, pan = 0, nf = 7, freqDiff = 2, outBus = 0 |
 	var sig, env, sig2, sig_beating, del, mod, lowcut_sig, lowcut_sig2;
 	// sig = Blip.ar(freq);
 	sig = LFPar.ar(freq);
@@ -310,7 +377,7 @@ SynthDef(\dds2, {| freq = 1, modfreq = 5, amp = 0.6, amp2 = 0.9, filfreq = 300, 
 	lowcut_sig2 = HPF.ar(sig2, hfFreq2);
 
 	// Out.ar(0, Pan2.ar((sig + sig2) * env, pan, amp));
-	Out.ar(0, Pan2.ar((lowcut_sig + lowcut_sig2) * env, pan, amp));
+	Out.ar(outBus, Pan2.ar((lowcut_sig + lowcut_sig2) * env, pan, amp));
 }).add;
 
 
