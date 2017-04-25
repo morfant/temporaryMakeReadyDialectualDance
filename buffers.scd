@@ -2,7 +2,7 @@
 //---------------------------- 0: EQ ----------------------------
 (
 // SLIDER
-~win = Window.new("4 CH mixer", Rect(0, 0, 400, 400)).front;
+~win = Window.new("4 CH mixer", Rect(1920, 0, 400, 400)).front;
 
 ~num_0 = NumberBox(~win, Rect(20, 20, 60, 40));
 ~num_1 = NumberBox(~win, Rect(20, 120, 60, 40));
@@ -48,6 +48,24 @@
 
 ~slid_3.value_(1.0/~scale);
 ~num_3.value_(~slid_3.value);
+
+
+
+// Mixer
+SynthDef.new(\mixer,
+	{
+		arg amp_0 = 0.5, amp_1 = 0.5, amp_2 = 0.5, amp_3 = 0.5, amp_master = 1.0;
+		var sig_0, sig_1, sig_2, sig_3;
+		sig_0 = In.ar(100, 2);
+		sig_1 = In.ar(102, 2);
+		sig_2 = In.ar(104, 2);
+		sig_3 = In.ar(106, 2);
+
+		Out.ar(0, ((sig_0*amp_0) + (sig_1*amp_1) + (sig_2*amp_2) + (sig_3*amp_3))*amp_master);
+
+	}
+).add;
+
 
 
 
@@ -168,10 +186,11 @@ SynthDef(\kim,
 
 
 SynthDef(\mf1,
-	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, atTime = 10.0, relTime = 10.0, outBus = 0 |
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, start = 0, susTime = 1.0, rate = 1, loop = 0, atTime = 0.1, relTime = 0.1, outBus = 0 |
 		var sig1, env;
-		sig1 = PlayBuf.ar(2, ~mf1, BufRateScale.kr(~mf1)*rate, startPos: 0, loop: loop, doneAction: 2);
-		env = EnvGen.kr(Env.linen(atTime, ~mf1.numFrames/s.sampleRate - (atTime + relTime), relTime), gate, doneAction:2);
+		sig1 = PlayBuf.ar(2, ~mf1, BufRateScale.kr(~mf1)*rate, startPos: start, loop: loop, doneAction: 2);
+		// env = EnvGen.kr(Env.linen(atTime, ~mf1.numFrames/s.sampleRate - (atTime + relTime), relTime), gate, doneAction:2);
+		env = EnvGen.kr(Env.linen(atTime, susTime, relTime), gate, doneAction:2);
 	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
 }).add;
@@ -394,20 +413,17 @@ SynthDef.new(\dum, {
 }).add;
 
 
-// Mixer
-SynthDef.new(\mixer,
-	{
-		arg amp_0 = 0.5, amp_1 = 0.5, amp_2 = 0.5, amp_3 = 0.5, amp_master = 1.0;
-		var sig_0, sig_1, sig_2, sig_3;
-		sig_0 = In.ar(100, 2);
-		sig_1 = In.ar(102, 2);
-		sig_2 = In.ar(104, 2);
-		sig_3 = In.ar(106, 2);
+// Ting
+SynthDef.new(\ting, {
+	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80, outBus = 104;
+	var env, sig, hf;
+	env = EnvGen.kr(Env.perc(), gate, doneAction: 2);
+	sig = LFPar.ar(freq, mul: amp);
+	sig = HPF.ar(sig, hfFreq);
+	Out.ar(outBus, Pan2.ar(sig*env, 0, outAmp));
 
-		Out.ar(0, ((sig_0*amp_0) + (sig_1*amp_1) + (sig_2*amp_2) + (sig_3*amp_3))*amp_master);
+}).add;
 
-	}
-).add;
 
 
 )
@@ -425,6 +441,7 @@ SynthDef.new(\mixer,
 	\dur, 0.5,
 	\atTime, 0.9,
 	\relTime, 0.1,
+	\amp, 0.5,
 	\outBus, 100
 );
 
@@ -436,6 +453,7 @@ SynthDef.new(\mixer,
 	\dur, 0.5,
 	\atTime, 0.9,
 	\relTime, 0.1,
+	\amp, 0.5,
 	\outBus, 102
 );
 
@@ -446,8 +464,20 @@ SynthDef.new(\mixer,
 	\freq, Pseq([620, 330, 370, 500, 330, 380, 320]*1.2, inf),
 	\dur, 0.5,
 	\atTime, 0.9,
+	\amp, 0.5,
 	\relTime, 0.1
 );
+
+
+/*// floating - 3
+~pb_mel_release = Pbind(
+	\instrument, \tak,
+	\freq, Pseq([620, 330, 370, 500, 330, 380, 320]*1.2, inf),
+	\dur, 0.5,
+	\atTime, 0.9,
+	\relTime, 0.1,
+	\amp, Pseq((0.5, 0.4..0.0), 6)
+);*/
 
 
 
@@ -532,6 +562,159 @@ SynthDef.new(\mixer,
 	\amp, 1.4,
 	\dur, Prand([1.0, 0.8, 0.7, 0.3, 1.5], inf)
 );
+
+
+
+// 대야씬
+~pb_bucket = Pbind(
+	\instrument, \mf2,
+	\rate, Pseq([
+
+		1, 0.5, -2, 5, 1, 1, 0.2, 0.9
+
+	]*2*(-1), inf),
+	\susTime, 0.05,
+	\dur, 0.6, // 처음 - 느리게
+	\start, Pseq([
+
+		10, 200, 30, 20, 280, 120, 70, 5,
+		10, 20, 30, 20, 90, 280, 70, 5,
+		10, 120, 230, 320, 90, 280, 70, 5
+
+	]*s.sampleRate, inf),
+	\amp, Pseq([0.5, 0.5, 0.6, 0.4, 0.1, 0.4, 0.4]*0.3, inf)
+);
+
+
+~pb_bucket_fast = Pbind(
+	\instrument, \mf2,
+	\rate, Pseq([
+
+		1, 0.5, -2, 5, 1, 1, 0.2, 0.9
+
+	]*2*(-1), inf),
+	\susTime, 0.05,
+	\dur, 0.5, // 셋이 될 때 - 좀 더 빠르게
+	\start, Pseq([
+
+		10, 200, 30, 20, 280, 120, 70, 5,
+		10, 20, 30, 20, 90, 280, 70, 5,
+		10, 120, 230, 320, 90, 280, 70, 5
+
+	]*s.sampleRate, inf),
+	\amp, Pseq([0.5, 0.5, 0.6, 0.4, 0.1, 0.4, 0.4]*0.3, inf)
+);
+
+
+// wing - 의자씬
+~pb_chair = Pbind(
+	\instrument, \mf2,
+	\rate, Pseq([1.8, 1.2, 1.8, 1.2, 1.8, 0.8]*4, inf),
+	\susTime, 0.6*4,
+	\atTime, Pseq([0.1]/2*4, inf),
+	\relTime, 0.01,
+	\dur, Pseq([
+
+		2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		// 1, 1, 0.7, 0.8,
+		// 2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		// 2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		// 2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		// 2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3
+
+	]*(7/6)*2, inf),
+	\start, s.sampleRate*120, // dist noise
+	\amp, Pseq([
+		0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+		0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+		0.05, 0.05, 0.05, 0.05, 0.05, 0.05
+
+	]/10, inf) // 더 작게
+);
+
+
+
+// trum - 침대옷장
+~pb_bed = Pbind(
+	\instrument, \mf2,
+	\rate, Pseq([1, 1, 1, 1.8, 1.0], inf),
+	\susTime, 0.6,
+	\atTime, Pseq([0.1]/2, inf),
+	\relTime, 0.01,
+	\dur, Pseq([2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3]*(7/6)*0.4, inf),
+	\start, s.sampleRate*331,	// trum
+	\amp, 0.2
+);
+
+
+
+// noise beat - 선반트리오
+~pb_shelf = Pbind(
+	\instrument, \mf2,
+	\rate, Pseq([1, 1, 1, 1, 1, 0.8, 1, 1, 1, 1, 1, 1.2, 1, 1, 1, 1, 1, 1.4, 1, 1, 1, 1, 1, 1.2, 1, 1, 1, 1, 1, 1.6]/2, inf),
+	\susTime, 0.6,
+	\atTime, Pseq([0.1]/2, inf),
+	\relTime, 0.01,
+	\dur, Pseq([
+
+		2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3,
+		2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3
+
+	]*(7/6)*0.4, inf),
+	\start, s.sampleRate*410, // dist noise
+	\amp, 0.2,
+	\outBus, 104
+
+);
+
+
+// 세탁기 + 변칙적인 긴 호흡
+~pb_wm_1 = Pbind(
+	\instrument, \mf2,
+	\rate, 1,
+	\susTime, 1.0,
+	\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
+	// \start, Pseq([40]*s.sampleRate, inf),
+	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/10, inf)
+);
+
+
+~pb_wm_2 = Pbind(
+	\instrument, \mf2,
+	\rate, 1,
+	\susTime, 1.0,
+	// \start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
+	\start, Pseq([40]*s.sampleRate, inf),
+	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/10, inf)
+);
+
+
+~r = 0.8;
+~pb_ddan = Pbind(
+	\instrument, \mf1,
+	\rate, 1*~r,
+	\susTime, 2.68*2,
+	\dur, 2.68*2,
+	\start, s.sampleRate*120,
+	\amp, 0.07
+);
+
+
+~r2 = 2.8;
+~pb_taltal = Pbind(
+	\instrument, \mf1,
+	\rate, 1*~r2,
+	\susTime, 2.7*2,
+	\dur, 2.68*2,
+	\start, s.sampleRate*68,
+	\amp, 0.1
+);
+
+
+
 
 );
 
