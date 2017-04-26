@@ -101,6 +101,8 @@ SynthDef.new(\mixer,
 ~kim = Buffer.read(s, "/Users/giy/Desktop/TMRDD/kim.aiff");
 // ~kim.play;
 
+~ha =  Buffer.read(s, "/Users/giy/Desktop/TMRDD/ha.aiff");
+// ~ha.play;
 
 ~mf1 = Buffer.read(s, "/Users/giy/Desktop/TMRDD/mf_1.aiff");
 // ~mf1.play;
@@ -175,6 +177,16 @@ SynthDef(\na3,
 }).add;
 
 
+SynthDef(\ha,
+	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, outBus = 106 |
+		var sig1, env;
+		sig1 = PlayBuf.ar(2, ~ha, BufRateScale.kr(~ha)*rate, startPos: 0, loop: loop, doneAction: 2);
+		env = EnvGen.kr(Env.linen(0.01, ~ha.numFrames/s.sampleRate, 0.2), gate, doneAction:2);
+	//env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
+	Out.ar(outBus, Pan2.ar((sig1) * env, pan, amp));
+}).add;
+
+
 SynthDef(\kim,
 	{| freq = 1, bufnum = 0, gate = 1, amp = 0.1, pan = 0, rate = 1, loop = 0, atTime = 10.0, relTime = 10.0 |
 		var sig1, env;
@@ -221,7 +233,7 @@ SynthDef(\kim,
 // Comp for ending
 SynthDef(\comp,
 	{
-		arg ths = 0.1, clampTime = 0.001, startBus = 60, outBus = 0, amp = 0.3;
+		arg ths = 0.1, clampTime = 0.001, startBus = 60, outBus = 0, amp = 1.0;
 		var finalSig, sigSum, sig0, sig1, sig2, sig3, sig4, sig5, sig6, sig7;
 		sig0 = In.ar(startBus, 2);
 		sig1 = In.ar(startBus + 2, 2);
@@ -402,9 +414,9 @@ SynthDef(\dds2, {| freq = 1, modfreq = 5, amp = 0.6, amp2 = 0.9, filfreq = 300, 
 
 // Dum
 SynthDef.new(\dum, {
-	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80, outBus = 104;
+	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80, outBus = 104, atTime = 0.01, relTime = 1;
 	var env, sig, sigG, sigNoise, hf;
-	env = EnvGen.kr(Env.perc(), gate, doneAction: 2);
+	env = EnvGen.kr(Env.perc(atTime, relTime), gate, doneAction: 2);
 	sigG = LFNoise0.kr(dens, freq/2, freq/2);
 	sig = LFPar.ar(sigG, mul: amp);
 	sig = HPF.ar(sig, hfFreq);
@@ -415,7 +427,7 @@ SynthDef.new(\dum, {
 
 // Ting
 SynthDef.new(\ting, {
-	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80, outBus = 104;
+	arg freq = 10, dens = 5, amp = 0.5, outAmp = 0.5, gate = 1, hfFreq = 80, outBus = 0;
 	var env, sig, hf;
 	env = EnvGen.kr(Env.perc(), gate, doneAction: 2);
 	sig = LFPar.ar(freq, mul: amp);
@@ -566,6 +578,7 @@ SynthDef.new(\ting, {
 
 
 // 대야씬
+~bucket_amp = 0.6;
 ~pb_bucket = Pbind(
 	\instrument, \mf2,
 	\rate, Pseq([
@@ -582,7 +595,7 @@ SynthDef.new(\ting, {
 		10, 120, 230, 320, 90, 280, 70, 5
 
 	]*s.sampleRate, inf),
-	\amp, Pseq([0.5, 0.5, 0.6, 0.4, 0.1, 0.4, 0.4]*0.3, inf)
+	\amp, Pseq([0.5, 0.5, 0.6, 0.4, 0.1, 0.4, 0.4]*~bucket_amp, inf)
 );
 
 
@@ -602,7 +615,7 @@ SynthDef.new(\ting, {
 		10, 120, 230, 320, 90, 280, 70, 5
 
 	]*s.sampleRate, inf),
-	\amp, Pseq([0.5, 0.5, 0.6, 0.4, 0.1, 0.4, 0.4]*0.3, inf)
+	\amp, Pseq([0.5, 0.5, 0.6, 0.4, 0.1, 0.4, 0.4]*~bucket_amp, inf)
 );
 
 
@@ -643,7 +656,7 @@ SynthDef.new(\ting, {
 	\relTime, 0.01,
 	\dur, Pseq([2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3]*(7/6)*0.4, inf),
 	\start, s.sampleRate*331,	// trum
-	\amp, 0.2
+	\amp, 0.8
 );
 
 
@@ -665,7 +678,7 @@ SynthDef.new(\ting, {
 
 	]*(7/6)*0.4, inf),
 	\start, s.sampleRate*410, // dist noise
-	\amp, 0.2,
+	\amp, 0.6,
 	\outBus, 104
 
 );
@@ -678,7 +691,7 @@ SynthDef.new(\ting, {
 	\susTime, 1.0,
 	\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
 	// \start, Pseq([40]*s.sampleRate, inf),
-	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/10, inf)
+	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/3, inf)
 );
 
 
@@ -688,7 +701,7 @@ SynthDef.new(\ting, {
 	\susTime, 1.0,
 	// \start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
 	\start, Pseq([40]*s.sampleRate, inf),
-	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/10, inf)
+	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/3, inf)
 );
 
 
@@ -713,6 +726,19 @@ SynthDef.new(\ting, {
 	\amp, 0.1
 );
 
+
+
+// 브릿지
+~pb_bridge = Pbind(
+	\instrument, \mf2,
+	\rate, Pseq([0.2, 0.6, 0.8, 0.1]*1.8, inf),
+	\susTime, 0.4,
+	\atTime, Pseq([0.07], inf),
+	\relTime, 0.1,
+	\dur, Pseq([2/3+0.3, 1, 0.9, 0.7]*(7/6)*0.3*2, inf),
+	\start, s.sampleRate*382,	// trum
+	\amp, 0.4
+);
 
 
 

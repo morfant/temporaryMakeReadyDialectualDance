@@ -1,26 +1,10 @@
 
-
-// //Q: 정아씨 대야에 머리 박으면
-// ~naration_32 = Synth(\tt, [\amp, 0.24]);
-// ~naration_32.free;
-//
-// //Q: 선시씨 옷장들고 충분히 등장하면
-// ~naration_book = Synth(\book, [\amp, 0.24]);
-// ~naration_book.free;
-//
-// //Q: 주성씨가 탄 욕조가 무대에 나오면
-// ~naration_forMe = Synth(\for, [\amp, 0.18]);
-// ~naration_forMe.free;
-
-
 // 볼륨 맥스에서 -5
 
 // narration
 //1. 시작 후 30초 세고 튼다.
-// ~masterEQ.gui.onSelect('narration');
-~na1_Syn = Synth(\na1, [\amp, 1.0, \outBus, 106]);
-//"새남자들을 맞았다" 후 30초 지난 후 볼륨 줄임.
-// ~masterEQ.gui.onSelect('narration');~na1_Syn = Synth(\na1, [\amp, 1.0, \outBus, 0]);
+~masterEQ.gui.onSelect('narration');~na1_Syn = Synth(\na1, [\amp, 1.6, \outBus, 106]);
+//"새남자들을 맞았다" 후 30초 지난 후 볼륨 줄임. (몇 초?    1: 32초에 줄인다)
 ~na1_Syn.free;
 
 
@@ -28,7 +12,7 @@
 // 오르간소리
 // mel
 ~m1.stop;~m2.stop;
-~masterEQ.gui.onSelect('x_flat');
+// ~masterEQ.gui.onSelect('x_flat');
 ~slid_0.value_(0);~mixer.set(\amp_0, 0);
 ~slid_1.value_(0);~mixer.set(\amp_1, 0);
 ~m1 = ~pb_mel_1.play;
@@ -36,86 +20,103 @@
 );
 
 
-// 오르간 끄고, 대야씬 음악 go
-~m1.stop;~m2.stop;~buc = ~pb_bucket.play; //EQ?
-~buc.stop;~buc_fast = ~pb_bucket_fast.play; // 셋 등장시 빠르게
-
+// 대야씬 음악 go, 오르간 페이드아웃
+~buc = ~pb_bucket.play; //EQ? - 볼륨 크게
+~m1.stop;~m2.stop;
 
 
 //의자씬
-(
 ~chair = ~pb_chair.play;// ~masterEQ.gui.onSelect('wing');
-)
 
 
-// 대야씬 아웃
-~buc_fast.stop;
-
+ // 셋 등장시 빠르게
+~buc.stop;~buc_fast = ~pb_bucket_fast.play;
 
 
 //침대옷장
-(
-~chair.stop;
+(// 대야가 나가면 주성씨 나온다.
+
+~buc.stop;
+~buc_fast.stop;// 대야씬 아웃
+~chair.stop;// 의자씬 아웃
+
 ~masterEQ.gui.onSelect('synth');
 ~bed = ~pb_bed.play;
 )
 
-//침대옷장 아웃
+
+//침대옷장 아웃, 메트리스 첫번째 칠 때 out. 2초후 나레이션.
 ~bed.stop;
 
 
-//2. 메트리스 in
-~masterEQ.gui.onSelect('narration');~na2_Syn = Synth(\na2, [\amp, 1.0,  \outBus, 106]);
+//2. 메트리스 첫 번째 엎고, 2초 후에 실행
+~masterEQ.gui.onSelect('narration');~na2_Syn = Synth(\na2, [\amp, 1.6,  \outBus, 106]);
 ~na2_Syn.free;
 
 
 
+// 브릿지
+// 메트리스를 침대에 팍 엎는 순간 go -  볼륨 업
+~bridge = ~pb_bridge.play;
+
+
+
 // Bass
-// 메트리스를 침대에 엎는 순간 go
+// 정아씨, 혜림씨 서면 브릿지 끝나는 박자에 맞춰서
 (
-~mixer.set(\amp_2, 2.2);
+
+~bridge.stop;
+
+~bass_default_amp = 0.6;
+~mixer.set(\amp_2, ~scale*~bass_default_amp);
+
+// sync
+~num_2.value_(~scale*~bass_default_amp.round(0.01));
+~slid_2.value_(~bass_default_amp);
+~mixer.set(\amp_2, ~bass_default_amp*~scale);
+
 ~masterEQ.gui.onSelect('nb');~dum_slow = ~pb_dum_slow.play;
+
 )
 
-// 자진모리 변형
-
-~c.stop;
-~c.stop;~b = ~pb_dum_fast.play;
-~b.stop;~a = ~pb_dum_basic.play;
-~a.stop;~b = ~pb_dum_fast.play;
-~b.stop;~c = ~pb_dum_slow.play;
 
 
-
-// 선반트리오
+// 선반트리오 - 선시씨 나와서 정아씨 옆에 서면 go
 (
-~dum_slow.stop;
+~pb_mf2_piano_2.stop;
+~default_amp = 0.5;
+~dum_slow.stop;~pb_dum_slow_2.stop;
 ~masterEQ.gui.onSelect('noise');
-~shelf = ~pb_shelf.play;
+
+// sync
+~num_2.value_(~scale*~default_amp.round(0.01));
+~slid_2.value_(~default_amp);
+~mixer.set(\amp_2, ~default_amp*~scale);
+
+~shelf.stop;~shelf = ~pb_shelf.play;
 )
+
 
 // 선시씨 물구나무서기 내려오는 것에 맞추어 CH3 으로 fade out
 ~shelf.stop;
 
 
 
-// 주성씨 세탁기에서 내려와서 바닥에 닿으면 - Ting
-(
-Synth(\ting, [\freq, 1700, \hfFreq, 1400, \amp, 0.4]);
-Synth(\ting, [\freq, 1690, \hfFreq, 1400, \amp, 0.4]);
-)
+
+// 무선 청소기 등장
+
 
 
 // 고조를 위한 함수
 (
-~reset_rate = {|r, r2|
+~reset_rate = {|r, r2, v, v2|
 
 ~pb_wm_1.stream = Pbind(
 	\instrument, \mf2,
 	\rate, r,
 	\susTime, 1.0,
 	\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
-	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/10, inf)
+	\amp, Pseq([0.8, 0.8, 0.6, 0.6]*1.2+v, inf)
 ).asStream;
 
 ~pb_tal.stream = Pbind(
@@ -124,114 +125,148 @@ Synth(\ting, [\freq, 1690, \hfFreq, 1400, \amp, 0.4]);
 	\susTime, 2.7*2,
 	\dur, 2.68*2,
 	\start, s.sampleRate*68,
-	\amp, 0.05
+	\amp, 0.53+v2
 ).asStream;
 
 }
 )
 
-// 태이씨 세탁기에서 나오면
-(
-~masterEQ.gui.onSelect('tal');
 
-~wm_1 = ~pb_wm_1 = Pbind(
-	\instrument, \mf2,
-	\rate, 1,
-	\susTime, 1.0,
-	\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
-	\amp, Pseq([0.8, 0.8, 0.6, 0.6]/10, inf)
-).play;
+// 주성씨 세탁기에서 내려와서 바닥에 닿으면 - Ting
+(
+fork{
+	1.do{
+		Synth(\ting, [\freq, 1700, \hfFreq, 1400, \amp, 0.6]);
+		Synth(\ting, [\freq, 1698, \hfFreq, 1400, \amp, 0.6]);
+
+		0.7.wait;
+
+
+		{~masterEQ.gui.onSelect('tal');}.defer;
+
+		// 태이씨 세탁기에서 나오면
+		~wm_1 = ~pb_wm_1 = Pbind(
+			\instrument, \mf2,
+			\rate, 1,
+			\susTime, 1.0,
+			\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
+			\amp, Pseq([0.8, 0.8, 0.6, 0.6]*1.2, inf)
+		).play;
+
+		7.2.wait;
+
+
+		// 태이씨 바닥에서 춤추기 시작하면
+		~r = 2.8;
+		~pb_tal = Pbind(
+			\instrument, \mf1,
+			\rate, 1*~r,
+			\susTime, 2.7*2,
+			\dur, 2.68*2,
+			\start, s.sampleRate*68,
+			\amp, 0.53
+		).play;
+	}
+}
+
 );
 
-
-// 태이씨 바닥에서 춤추기 시작하면
-(
-~r = 2.8;
-~pb_tal = Pbind(
-	\instrument, \mf1,
-	\rate, 1*~r,
-	\susTime, 2.7*2,
-	\dur, 2.68*2,
-	\start, s.sampleRate*68,
-	\amp, 0.05
-	).play;
-)
 
 
 // 고조 실행
 (
 fork{
-	20.do{| i |
+	30.do{| i |
 		(i/10).postln;
-		{ ~reset_rate.value(1.0 + (i/10), 2.8 + (i/10)) }.defer;
+		{ ~reset_rate.value(1.0 + (i/10), 2.8 + (i/10), (i/40), (i/40) )}.defer;
 		2.6*2.wait;
 	}
 }
 )
 
-// 민하씨가 커튼 뺏을 때, cmd + . 으로 컷아웃
+// 민하씨가 커튼 뺏을 때, cmd + . 으로 컷아웃 - 완전히 떨어질 때!
 
 
 
 // 김광석 노래
 // 서른즈음에 (2절 '점점더~' 부터)
 //1. 페이드 인
-~masterEQ.gui.onSelect('x_flat');~kim_song = Synth(\kim, [\amp, 0.4, \atTime, 20, \relTime, 10, \gate, 1]);
+~masterEQ.gui.onSelect('x_flat');~kim_song = Synth(\kim, [\amp, 0.5, \atTime, 20, \relTime, 10, \gate, 1]);
 
 // 2. 페이드아웃
-~kim_song.release(14);
+~kim_song.release(8); // 스피커 나오기 시작하면 go
 
 
 // 테스트용
 ~kim_song.release(1);
 
 
-
-//나레이션 3. 스피커 in
-~masterEQ.gui.onSelect('narration');~na3_Syn = Synth(\na3, [\amp, 0.8, \outBus, 106]);
+// 김광석 노래 페이드아웃 중에,
+//나레이션 3. 스피커 in, 무대 중간 밟을때, 나온다.
+~masterEQ.gui.onSelect('narration');~na3_Syn = Synth(\na3, [\amp, 2.0, \outBus, 106]);
 ~na3_Syn.free;
 
 
 // '하' 파일 예비로 실행할 수 있게 준
+~masterEQ.gui.onSelect('narration');~ha_Syn = Synth(\ha, [\amp, 3.0, \outBus, 106]);
+~ha_Syn.free;
 
 
 
+
+// cmd + . 으로 리셋 한번 한다!!!!
 // Ending - 처음부터 갑자기 커야 한다
 // 컴퓨터 풀볼륨으로 시작
  // BPM은 65
-//컴프 걸 수 있게 할 것
+// eq piano 되어 있는지 확인!!!!
 
-~comp_Syn = Synth(\comp, [\outBus, 0, \clampTime, 0.001]);
+(//1. eq, comp
 
-(
-// Ending - 시작부터 갑자기 커야 한다
-~amp = 0.5;
-~bpmScale = 65/60;
-// ~masterEQ.gui.onSelect('ending');
-a.free;a = Synth(\dds, [\nf, 0.2, \freq, 2, \filFreq, 100, \susTime, 4, \amp, ~amp]);
-// a.set(\nf, 2, \freq, 2, \filFreq, 100, \susTime, 1);
+~masterEQ.gui.onSelect('piano');
+~comp_Syn = Synth(\comp, [\outBus, 0, \ths, 0.01, \clampTime, 0.00001, \amp, 0.7]);
 
-a.free;a = Synth(\dds, [\freq, 3*~bpmScale, \freqDiff, 30, \amp, ~amp, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1*~bpmScale]);
-b.free;b = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1*~bpmScale]);
-// b.free;
-c.free;c = Synth(\dds, [\freq, 0.5*~bpmScale, \freqDiff, 18, \amp, ~amp-0.1, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 2*~bpmScale]);
-// c.free;
-d.free;d = Synth(\dds, [\freq, 1.5*~bpmScale, \freqDiff, 18, \amp, ~amp/4, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 6*~bpmScale]);
-// e.free;e = Synth(\dds, [\freq, 2*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf,1*~bpmScale]);
-
-// d.free;
-
-// ~mf2_Syn = Synth(\mf2, [\amp, 0.4, \outBus, 0, \susTime, 39, \rate, ~bpmScale/4]);
-~mf1_Syn = Synth(\mf1, [\amp, 0.4, \outBus, 0, \susTime, 300, \rate, ~bpmScale/2]);
-
-
-// ~pb_mf2_synthBass.play;
-// ~pb_mf2_piano_2.play;
-
+// ~comp_Syn.set(\amp, 0.8);
 )
 
 
 
+// 베이스음의 성질 - 왜 안 커지는지
+// 컴프
+// eq로 고조
+// 볼륨도 고조
+
+
+(
+//2. synths - 녹음해 버리자!
+
+// Ending - 시작부터 갑자기 커야 한다:
+~amp = 0.6;
+~bpmScale = 65/60;
+
+~beat_a.free;~beat_a = Synth(\dds, [\freq, 3*~bpmScale, \freqDiff, 30, \amp, ~amp, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1*~bpmScale, \outBus, 60]);
+~beat_b.free;~beat_b = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1*~bpmScale, \outBus, 60]);
+// ~beat_c.free;~beat_c = Synth(\dds, [\freq, 2, \filFreq, 100, \susTime, 4, \amp, ~amp+0.5, \nf, 0.2, \outBus, 60]);
+~beat_d.free;~beat_d = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1*~bpmScale, \outBus, 60]);
+~beat_e.free;~beat_e = Synth(\dds, [\freq, 0.5*~bpmScale, \freqDiff, 18, \amp, ~amp-0.1, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 2*~bpmScale, \outBus, 60]);
+~beat_f.free;~beat_f = Synth(\dds, [\freq, 1.5*~bpmScale, \freqDiff, 18, \amp, ~amp/4, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 6*~bpmScale, \outBus, 60]);//high
+
+
+
+
+// ~beat_g.free;~beat_g = Synth(\dds, [\freq, 2*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf,1*~bpmScale]);
+
+)
+
+
+// 3번째 루프의 반에 튼다.
+~mf1_Syn = Synth(\mf1, [\amp, 0.4, \outBus, 60, \susTime, 300, \rate, ~bpmScale/2]);
+~mf1_Syn.free;
+
+
+// cmd + . 으로 컷아웃
+
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 
 ~pb_dum.stop;
@@ -568,8 +603,8 @@ a.free;b.free;c.free;d.free;e.free;f.free;g.free;~mf1_Syn.free;~mf2_Syn.free;~co
 ~pb_mf2_piano_2.stream = Pbind(
 	\instrument, \mf2,
 	// \rate, 1,
-	// \rate, Pseq([1, 1, 1, 1, 1, 2, 9, 4, 1, 0.8], inf),
-	\rate, Pseq([1, 1, 1,  1, 1, 0.8]*2.2, inf),
+	// \rate, Pseq([1, 1, 1, 1, 1, 1.2, 1, 3, 1, 0.8], inf),
+	\rate, Pseq([1, 1, 1,  1, 1, 0.8, 2, 2.1, 1.5]*2.2, inf),
 	// \rate, Pseq([1, 1, 1, 1.8, 1.0], inf),
 	// \susTime, 0.06,
 	\susTime, 1.4,
@@ -577,12 +612,12 @@ a.free;b.free;c.free;d.free;e.free;f.free;g.free;~mf1_Syn.free;~mf2_Syn.free;~co
 	\atTime, Pseq([0.9], inf),
 	\relTime, 0.01,
 	// \dur, Pseq([2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3, 1, 0.7, 2/3, 2/3+0.2]*(7/6)*0.4, inf),
-	\dur, Pseq([2/3+0.3, 1, 0.7, 0.7, 0.5, 0.4, 0.1, 1 ]*(7/6)*0.3*2, inf),
+	\dur, Pseq([2/3+0.3, 1, 0.7, 0.7, 0.5, 0.4, 0.1, 1, 0.3 ]*(7/6)*0.3*2, inf),
 	// \start, s.sampleRate*231,
 	// \start, s.sampleRate*331,	// trum
 	// \start, s.sampleRate*382,	// trum
 	\start, s.sampleRate*382,	// trum
-	\amp, 0.1
+	\amp, 0.005
 ).asStream;
 )
 
@@ -637,6 +672,7 @@ a.set(\freq, 30*~bpmScale);
 )
 
 
+
 ~pb_mf2_synthBass.stop;
 
 (// trum - 대대옷장
@@ -663,30 +699,34 @@ a.set(\freq, 30*~bpmScale);
 ~pb_mf2_synthBass.play;
 ~pb_mf2_synthBass.stop;
 
-
+asdfasd
 (// piano
-~masterEQ.gui.onSelect('piano');
+// ~masterEQ.gui.onSelect('piano');
 
 ~pb_mf2_piano_2.stream = Pbind(
+	// ~pb_mf2_piano_2 = Pbind(
 	\instrument, \mf2,
 	// \rate, 1,
 	// \rate, Pseq([1, 1, 1, 1, 1, 2, 9, 4, 1, 0.8], inf),
-	\rate, Pseq([1, 1, 1, 1, 1, 0.8, 1.3, 1.5, 1.3, 1.6]/2, inf),
+	// \rate, Pseq([1, 1, 1, 1, 1, 0.8, 1.3, 1.5, 1.3, 1.6]/2, inf),
+	\rate, Pseq([14, 18, 10, 8]/2, inf),
 	// \rate, Pseq([1, 1, 1, 1.8, 1.0], inf),
 	// \susTime, 0.06,
 	\susTime, 0.6,
 	// \atTime, Pseq([0.1, 0.1, 0.2, 0.15, 0.4]/2, inf),
-	\atTime, Pseq([0.1]/2, inf),
+	\atTime, Pseq([0.1]*3, inf),
 	\relTime, 0.01,
 	// \dur, Pseq([2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3, 1, 0.7, 2/3, 2/3+0.2]*(7/6)*0.4, inf),
-	\dur, Pseq([2/3+0.3, 1, 0.7, 2/3+0.2, 2/3, 2/3+0.3, 1, 1, 0.7, 0.8]*(7/6)*0.4, inf),
+	\dur, Pseq([2/3+0.3, 1, 0.7, 2/3+0.2]*(7/6)*0.4, inf),
 	// \start, s.sampleRate*231,
 	// \start, s.sampleRate*331,	// trum
 	\start, s.sampleRate*382,	// trum
-	\amp, 0.2
-).asStream;
+	\amp, 0.05
+	).asStream;
+// ).play;
 )
 
+~pb_mf2_piano_2.play;
 
 
 
