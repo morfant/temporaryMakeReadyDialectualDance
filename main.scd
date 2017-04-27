@@ -4,7 +4,7 @@
 // narration
 //1. 시작 후 30초 세고 튼다.
 ~masterEQ.gui.onSelect('narration');~na1_Syn = Synth(\na1, [\amp, 1.6, \outBus, 106]);
-//"새남자들을 맞았다" 후 30초 지난 후 볼륨 줄임. (몇 초?    1: 32초에 줄인다)
+//"새남자들을 맞았다" 후 30초 지난 후 볼륨 줄임. (몇 초?    1: 35초에 줄인다)
 ~na1_Syn.free;
 
 
@@ -21,7 +21,7 @@
 
 
 // 대야씬 음악 go, 오르간 페이드아웃
-~buc = ~pb_bucket.play; //EQ? - 볼륨 크게
+~buc = ~pb_bucket.play;
 ~m1.stop;~m2.stop;
 
 
@@ -56,7 +56,7 @@
 
 
 // 브릿지
-// 메트리스를 침대에 팍 엎는 순간 go -  볼륨 업
+// 메트리스를 침대에 팍 엎는 순간 go
 ~bridge = ~pb_bridge.play;
 
 
@@ -67,7 +67,7 @@
 
 ~bridge.stop;
 
-~bass_default_amp = 0.6;
+~bass_default_amp = 0.3;
 ~mixer.set(\amp_2, ~scale*~bass_default_amp);
 
 // sync
@@ -84,7 +84,7 @@
 // 선반트리오 - 선시씨 나올때  go
 (
 ~pb_mf2_piano_2.stop;
-~default_amp = 0.5;
+~default_amp = 0.3;
 ~dum_slow.stop;~pb_dum_slow_2.stop;
 ~masterEQ.gui.onSelect('noise');
 
@@ -105,7 +105,7 @@
 
 // 무선 청소기 등장
 
-
+// 세탁기 볼륨 업!
 
 // 고조를 위한 함수
 (
@@ -116,7 +116,7 @@
 	\rate, r,
 	\susTime, 1.0,
 	\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
-	\amp, Pseq([0.8, 0.8, 0.6, 0.6]*1.2+v, inf)
+	\amp, Pseq([0.8, 0.8, 0.6, 0.6]*1.4+v, inf)
 ).asStream;
 
 ~pb_tal.stream = Pbind(
@@ -125,7 +125,7 @@
 	\susTime, 2.7*2,
 	\dur, 2.68*2,
 	\start, s.sampleRate*68,
-	\amp, 0.53+v2
+	\amp, 0.6+v2
 ).asStream;
 
 }
@@ -136,8 +136,8 @@
 (
 fork{
 	1.do{
-		Synth(\ting, [\freq, 1700, \hfFreq, 1400, \amp, 0.6]);
-		Synth(\ting, [\freq, 1698, \hfFreq, 1400, \amp, 0.6]);
+		Synth(\ting, [\freq, 1500, \hfFreq, 1400, \amp, 0.7]);
+		Synth(\ting, [\freq, 1498, \hfFreq, 1400, \amp, 0.7]);
 
 		0.7.wait;
 
@@ -150,7 +150,7 @@ fork{
 			\rate, 1,
 			\susTime, 1.0,
 			\start, Pseq([10, 20, 30, 40]*s.sampleRate, inf),
-			\amp, Pseq([0.8, 0.8, 0.6, 0.6]*1.2, inf)
+			\amp, Pseq([0.8, 0.8, 0.6, 0.6]*1.4, inf)
 		).play;
 
 		7.2.wait;
@@ -164,7 +164,7 @@ fork{
 			\susTime, 2.7*2,
 			\dur, 2.68*2,
 			\start, s.sampleRate*68,
-			\amp, 0.53
+			\amp, 0.6
 		).play;
 	}
 }
@@ -236,20 +236,18 @@ fork{
 ~amp = 0.9;
 ~bpmScale = 65/60;
 
-~beat_a.free;~beat_a = Synth(\dds, [\freq, 3*~bpmScale, \freqDiff, 30, \amp, ~amp, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1*~bpmScale, \amp2, 0.1, \outBus, 60]);
-~beat_b.free;~beat_b = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp-0.4, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 2000, \nf, 1*~bpmScale, \amp2, 0.1,  \outBus, 60]);
-// ~beat_c.free;~beat_c = Synth(\dds, [\freq, 2, \filFreq, 100, \susTime, 4, \amp, ~amp+0.5, \nf, 0.2, \outBus, 60]);
-~beat_d.free;~beat_d = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1*~bpmScale, \amp2, 0.1,  \outBus, 60]);
-~beat_e.free;~beat_e = Synth(\dds, [\freq, 0.5*~bpmScale, \freqDiff, 18, \amp, ~amp-0.1, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 2*~bpmScale, \amp2, 0.1,  \outBus, 60]);
-~beat_f.free;~beat_f = Synth(\dds, [\freq, 1.5*~bpmScale, \freqDiff, 18, \amp, ~amp/4, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 6*~bpmScale, \amp2, 0.1,  \outBus, 60]);//high
+// ~beat_a.free;~beat_b.free;~beat_d.free;~beat_e.free;~beat_f.free;~mf1_Syn.free;
 
-// ~beat_g.free;~beat_g = Synth(\dds, [\freq, 2*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf,1*~bpmScale]);
-
+~beat_a = Synth(\dds, [\freq, 3*~bpmScale, \freqDiff, 30, \amp, ~amp, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 3000,  \nf, 1*~bpmScale, \amp2, 0.3, \outBus, 60]);
+~beat_b = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp-0.4, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 2000, \nf, 1*~bpmScale, \amp2, 0.3,  \outBus, 60]);
+~beat_d = Synth(\dds, [\freq, 1*~bpmScale, \freqDiff, 2, \amp, ~amp-0.1, \filfreq, 100, \hfFreq1, 100, \hfFreq2, 5000, \nf, 1*~bpmScale, \amp2, 0.3,  \outBus, 60]);
+~beat_e = Synth(\dds, [\freq, 0.5*~bpmScale, \freqDiff, 18, \amp, ~amp-0.1, \filfreq, 180, \hfFreq1, 100, \hfFreq2, 50, \nf, 2*~bpmScale, \amp2, 0.3,  \outBus, 60]);
+~beat_f = Synth(\dds, [\freq, 1.5*~bpmScale, \freqDiff, 18, \amp, ~amp/4, \filfreq, 4080, \hfFreq1, 100, \hfFreq2, 100, \nf, 6*~bpmScale, \amp2, 0.3,  \outBus, 60]);//high
 )
 
 
 // 3번째 루프의 반에 튼다.
-~mf1_Syn = Synth(\mf1, [\amp, 0.3, \outBus, 60, \susTime, 300, \rate, ~bpmScale/2]);
+~mf1_Syn = Synth(\mf1, [\amp, 0.35, \outBus, 60, \susTime, 300, \rate, ~bpmScale/2]);
 ~mf1_Syn.free;
 
 // eq로 변화 주기
