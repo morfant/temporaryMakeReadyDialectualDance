@@ -112,9 +112,12 @@ SynthDef.new(\mixer,
 // ~mf2.play;
 // ~mf2.free;
 
+~end_beat = Buffer.read(s, "/Users/giy/Desktop/TMRDD/end_beat.aiff");
+// ~end_beat.play;
+
 )
 
-
+s.meter
 
 //---------------------------- 2: Synths ----------------------------
 (
